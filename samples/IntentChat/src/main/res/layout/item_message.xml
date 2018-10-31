@@ -16,12 +16,12 @@
         android:textColor="@android:color/black"
         android:text="hello word" />
 
-    <TextView
+    <Button
         android:id="@+id/tv_message_time"
         android:layout_width="wrap_content"
         android:textColor="@android:color/black"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:text="201801011" />
+        android:text="删除" />
 
 </RelativeLayout>

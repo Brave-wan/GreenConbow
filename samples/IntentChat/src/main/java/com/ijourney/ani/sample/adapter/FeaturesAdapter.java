@@ -1,16 +1,14 @@
 package com.ijourney.ani.sample.adapter;
 
 import android.content.Context;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.VideoView;
 
+import com.ijourney.ani.sample.bean.FeaturesBean;
 import com.ijourney.ani.sample.bean.MessageBean;
 import com.ijourney.ani.sample.intentchat.R;
 
@@ -19,12 +17,12 @@ import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageAdapter extends BaseAdapter {
+public class FeaturesAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private Context mContext;
-    private List<MessageBean> list = new ArrayList<>();
+    private List<FeaturesBean> list = new ArrayList<>();
 
-    public MessageAdapter(Context mContext, List<MessageBean> list) {
+    public FeaturesAdapter(Context mContext, List<FeaturesBean> list) {
         this.mContext = mContext;
         this.list = list;
         inflater = LayoutInflater.from(mContext);
@@ -32,7 +30,7 @@ public class MessageAdapter extends BaseAdapter {
     }
 
     public void setData() {
-        list = DataSupport.findAll(MessageBean.class);
+        list = DataSupport.findAll(FeaturesBean.class);
         notifyDataSetChanged();
     }
 
@@ -62,8 +60,8 @@ public class MessageAdapter extends BaseAdapter {
         }
         holder.tv_message_content = (TextView) convertView.findViewById(R.id.tv_message_content);
         holder.tv_message_time = (Button) convertView.findViewById(R.id.tv_message_time);
-        final MessageBean bean = list.get(position);
-        holder.tv_message_content.setText(bean.getMessage());
+        final FeaturesBean bean = list.get(position);
+        holder.tv_message_content.setText(bean.getName());
         holder.tv_message_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

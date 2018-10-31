@@ -23,6 +23,11 @@ public class MessageDialog extends Dialog implements View.OnClickListener {
     MessageAdapter adapter;
     Context context;
     Button btn_delete_message, btn_send_message;
+    private onMessageListener listener;
+
+    public void setOnMessageListener(onMessageListener listener) {
+        this.listener = listener;
+    }
 
     public MessageDialog(Context mContext) {
         super(mContext, R.style.Dialog);
@@ -43,11 +48,26 @@ public class MessageDialog extends Dialog implements View.OnClickListener {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MessageBean bean = (MessageBean) adapter.getItem(position);
-                Toast.makeText(context,bean.getMessage(),Toast.LENGTH_LONG).show();
-
-
+                Toast.makeText(context, bean.getMessage(), Toast.LENGTH_LONG).show();
+                listener.sendMessage(bean);
+                dismiss();
             }
         });
+        lv_message.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                MessageBean bean = (MessageBean) adapter.getItem(position);
+                bean.delete();
+                Toast.makeText(context,"长按删除",Toast.LENGTH_LONG).show();
+                adapter.setData();
+                return false;
+            }
+        });
+    }
+
+
+    public interface onMessageListener {
+        void sendMessage(MessageBean bean);
     }
 
     @Override

@@ -55,7 +55,6 @@ public class Transmitter {
 
     public void transmit(String msg) throws TransmitterException {
         DatagramSocket socket = null;
-
         try {
             socket = createSocket();
             transmit(socket, msg);
@@ -72,7 +71,7 @@ public class Transmitter {
         }
     }
 
-    protected DatagramSocket createSocket() throws IOException {
+    protected DatagramSocket  createSocket() throws IOException {
         return new DatagramSocket();
     }
 
