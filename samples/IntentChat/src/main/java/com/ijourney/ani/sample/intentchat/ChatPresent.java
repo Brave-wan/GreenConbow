@@ -35,7 +35,7 @@ public class ChatPresent {
     // 发送心跳包
     private Handler mHandler = new Handler();
     // 每隔2秒发送一次心跳包，检测连接没有断开
-    private static final long HEART_BEAT_RATE = 5 * 1000;
+    private static final long HEART_BEAT_RATE = 10 * 1000;
     private IChatView mView;
 
     // 发送心跳包
@@ -43,9 +43,10 @@ public class ChatPresent {
         @Override
         public void run() {
             if (System.currentTimeMillis() - sendTime >= HEART_BEAT_RATE) {
-//                String message = connectData();
-//                mSocket.send(message);
-//                sendTime = System.currentTimeMillis();
+                String message = sendHerData("100","100.png");
+                mSocket.send(message);
+                Log.i("TAG","message:"+message);
+                sendTime = System.currentTimeMillis();
             }
             mHandler.postDelayed(this, HEART_BEAT_RATE); //每隔一定的时间，对长连接进行一次心跳检测
         }
@@ -155,7 +156,21 @@ public class ChatPresent {
         }
         return jsonHead;
     }
-
+    public String sendHerData(String position, String page) {
+        String jsonHead = "";
+        List<OrderListBean> listBeans = new ArrayList<>();
+        OrderListBean bean = new OrderListBean();
+        bean.setPage(position);
+        bean.setShowImg(page);
+        listBeans.add(bean);
+        Map<String, Object> mapHead = new HashMap<>();
+        mapHead.put("type", "order");
+        mapHead.put("server", "server2010701");
+        mapHead.put("value", "");
+        mapHead.put("order", listBeans);
+        jsonHead = buildRequestParams(mapHead);
+        return jsonHead;
+    }
 
     public static String buildRequestParams(Object params) {
         Gson gson = new Gson();
@@ -190,16 +205,18 @@ public class ChatPresent {
     public List<FixedBean> getFixedTop() {
         List<FixedBean> featuresBeans = new ArrayList<>();
 
-        featuresBeans.add(new FixedBean("首页", getFixedName("fixed_home", ""), "20", "20.png","fixed_home"));
-        featuresBeans.add(new FixedBean("视频播放", getFixedName("fixed_video", ""), "21", "21.png","fixed_video"));
-        featuresBeans.add(new FixedBean("视频定格", getFixedName("fixed_freeze", ""), "11", "11.png","fixed_freeze"));
-        featuresBeans.add(new FixedBean("缴费", getFixedName("fixed_payment", (mContext.getResources().getString(R.string.first_paragraph))), "1_1", "1_1.png","fixed_payment"));
-        featuresBeans.add(new FixedBean("报事", getFixedName("fixed_report", (mContext.getResources().getString(R.string.two_paragraph))), "1_2", "1_2.png","fixed_report"));
-        featuresBeans.add(new FixedBean("放行", getFixedName("fixed_release", (mContext.getResources().getString(R.string.three_paragraph))), "1_3", "1_3.png","fixed_release"));
-        featuresBeans.add(new FixedBean("呼叫", getFixedName("fixed_call", (mContext.getResources().getString(R.string.four_paragraph))), "1_4", "1_4.png","fixed_call"));
-        featuresBeans.add(new FixedBean("自动播放", getFixedName("fixed_auto", ""), "1_auto", "1_auto.png","fixed_auto"));
-        featuresBeans.add(new FixedBean("启动天启", getFixedName("fixed_start", ""), "2", "2.png","fixed_start"));
-        featuresBeans.add(new FixedBean("暂停", getFixedName("fixed_pause", ""), "", "","fixed_pause"));
+        featuresBeans.add(new FixedBean("首页", getFixedName("fixed_home", ""), "20", "20.png", "fixed_home"));
+        featuresBeans.add(new FixedBean("视频播放", getFixedName("fixed_video", ""), "21", "21.png", "fixed_video"));
+//        featuresBeans.add(new FixedBean("视频定格", getFixedName("fixed_freeze", ""), "11", "11.png", "fixed_freeze"));
+        featuresBeans.add(new FixedBean("缴费", getFixedName("fixed_payment", (mContext.getResources().getString(R.string.first_paragraph))), "1_1", "1_1.png", "fixed_payment"));
+        featuresBeans.add(new FixedBean("报事", getFixedName("fixed_report", (mContext.getResources().getString(R.string.two_paragraph))), "1_2", "1_2.png", "fixed_report"));
+        featuresBeans.add(new FixedBean("放行", getFixedName("fixed_release", (mContext.getResources().getString(R.string.three_paragraph))), "1_3", "1_3.png", "fixed_release"));
+        featuresBeans.add(new FixedBean("呼叫", getFixedName("fixed_call", (mContext.getResources().getString(R.string.four_paragraph))), "1_4", "1_4.png", "fixed_call"));
+
+        String msg = mContext.getResources().getString(R.string.first_paragraph) + mContext.getResources().getString(R.string.two_paragraph) + mContext.getResources().getString(R.string.three_paragraph) + mContext.getResources().getString(R.string.four_paragraph);
+//        featuresBeans.add(new FixedBean("自动播放", getFixedName("fixed_auto", msg), "1_auto", "1_auto.png", "fixed_auto"));
+        featuresBeans.add(new FixedBean("启动天启", getFixedName("fixed_start", ""), "2", "2.png", "fixed_start"));
+        featuresBeans.add(new FixedBean("暂停", getFixedName("fixed_pause", ""), "", "", "fixed_pause"));
         return featuresBeans;
     }
 

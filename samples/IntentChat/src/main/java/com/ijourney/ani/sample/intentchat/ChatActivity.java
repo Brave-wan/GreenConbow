@@ -119,6 +119,7 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 fixedBean = (FixedBean) fixedListAdapter.getItem(position);
+                fixedPositon = position;
                 bean = null;
                 clearListState();
                 for (FixedBean features : fixedBeans) {
@@ -128,6 +129,10 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
                 fixedListAdapter.setData(fixedBeans);
                 if (!StringUtils.isEmpty(fixedBean.getContent())) {
                     sendChatMessage(fixedBean.getContent());
+                }
+                if (!StringUtils.isEmpty(fixedBean.getSocket_position()) && !StringUtils.isEmpty(fixedBean.getSocket_page())) {
+                    present.sendMsgData(fixedBean.getSocket_position(), fixedBean.getSocket_page());
+
                 }
                 ed_content.setText(fixedBean.getContent());
             }
@@ -160,6 +165,7 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
                 if (!StringUtils.isEmpty(bean.getContent())) {
                     sendChatMessage(bean.getContent());
                 }
+
 
             }
         });
@@ -234,9 +240,7 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
                 break;
             case R.id.tx_save:
                 String edContentMsg = ed_content.getText().toString().trim();
-                if (!StringUtils.isEmpty(edContentMsg)) {
-                    msgSave(edContentMsg);
-                }
+                msgSave(edContentMsg);
                 break;
 
             case R.id.btn_add:
@@ -248,11 +252,13 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
         }
     }
 
+    private int fixedPositon = 0;
 
     public void msgSave(String msg) {
         if (bean == null) {//选择保存的是按钮
             SharedPreferencesUtils.init(this).put(fixedBean.getTag(), msg);
             fixedBeans = present.getFixedTop();
+            fixedBeans.get(fixedPositon).setCheck(true);
             fixedListAdapter.setData(fixedBeans);
             Toast.makeText(this, "保存成功!", Toast.LENGTH_LONG).show();
         } else {//item 内容保存
