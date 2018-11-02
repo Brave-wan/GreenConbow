@@ -7,9 +7,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ijourney.ani.sample.bean.FeaturesBean;
 import com.ijourney.ani.sample.bean.MessageBean;
+import com.ijourney.ani.sample.intentchat.MessageDialog;
 import com.ijourney.ani.sample.intentchat.R;
 
 import org.litepal.crud.DataSupport;
@@ -59,7 +61,8 @@ public class FeaturesAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         holder.tv_message_content = (TextView) convertView.findViewById(R.id.tv_message_content);
-        holder.tv_message_time = (Button) convertView.findViewById(R.id.tv_message_time);
+        holder.tv_message_time = (TextView) convertView.findViewById(R.id.tv_message_time);
+        holder.tv_message_alter = (TextView) convertView.findViewById(R.id.tv_message_alter);
         final FeaturesBean bean = list.get(position);
         holder.tv_message_content.setText(bean.getName());
         holder.tv_message_time.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +72,20 @@ public class FeaturesAdapter extends BaseAdapter {
                 setData();
             }
         });
+        holder.tv_message_alter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MessageDialog dialog = new MessageDialog(mContext, bean);
+                dialog.show();
+                dialog.setOnMessageListener(new MessageDialog.onMessageListener() {
+                    @Override
+                    public void sendMessage(FeaturesBean bean) {
+                        Toast.makeText(mContext, bean.getName(), Toast.LENGTH_LONG).show();
+                        setData();
+                    }
+                });
+            }
+        });
         return convertView;
     }
 
@@ -76,6 +93,7 @@ public class FeaturesAdapter extends BaseAdapter {
 
     class ViewHolder {
         TextView tv_message_content;
-        Button tv_message_time;
+        TextView tv_message_time;
+        TextView tv_message_alter;
     }
 }

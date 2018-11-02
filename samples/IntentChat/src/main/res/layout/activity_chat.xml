@@ -1,12 +1,14 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/rl_chat_title"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_alignParentTop="true"
         android:paddingLeft="15dp">
 
         <ImageView
@@ -30,216 +32,135 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="15dp"
-            android:src="@drawable/icon_kangbao_add" />
+            android:src="@drawable/icon_chat_menu" />
     </RelativeLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#dfdfdf" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_list"
-        android:layout_width="match_parent"
-        android:layout_height="60dp" />
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@drawable/shape_features_edit_bg">
-
-        <EditText
-            android:id="@+id/ed_content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/white"
-            android:gravity="left|top"
-            android:hint="请输入命令类容"
-            android:padding="10dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tx_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="15dp"
-            android:layout_marginRight="15dp"
-            android:padding="5dp"
-            android:text="编辑"
-            android:textSize="16sp"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tx_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="15dp"
-            android:layout_marginRight="15dp"
-            android:padding="5dp"
-            android:text="保存"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/tx_send"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/tx_save"
-            android:layout_marginRight="10dp"
-            android:layout_toLeftOf="@+id/tx_save"
-            android:padding="5dp"
-            android:text="发送"
-            android:textSize="16sp" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:visibility="gone">
-
-        <TextView
-            android:id="@+id/tx_socket_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="socket发送参数设置" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/tx_socket_title"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="position:" />
-
-            <EditText
-                android:id="@+id/ed_socket_position"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:hint="请输入"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="15dp"
-                android:text="page:" />
-
-            <EditText
-                android:id="@+id/ed_socket_page"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:hint="请输入"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_socket_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="15dp"
-            android:text="保存" />
-
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/btn_home"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="首页" />
-
-        <Button
-            android:id="@+id/btn_video"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="播放视频" />
-
-        <Button
-            android:id="@+id/btn_Introduction"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="康宝介绍" />
-
-        <Button
-
-            android:id="@+id/btn_start"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="启动天启" />
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#743A3A"
-        android:orientation="vertical"
-        tools:context=".ChatActivity">
+        android:layout_below="@+id/rl_chat_title"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#dfdfdf" />
 
         <ScrollView
-            android:id="@+id/scroll"
+            android:id="@+id/scrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="0dp"
+            android:layout_weight="2"
+            android:paddingTop="15dp">
 
-            <TextView
-                android:id="@+id/chat"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white" />
+                android:layout_height="match_parent"
+
+                android:orientation="vertical">
+
+                <com.ijourney.ani.sample.adapter.MyGridView
+                    android:id="@+id/rv_fixed_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:horizontalSpacing="5dp"
+                    android:listSelector="@android:color/transparent"
+                    android:numColumns="3"
+                    android:verticalSpacing="10dp" />
+
+
+                <com.ijourney.ani.sample.adapter.MyGridView
+                    android:id="@+id/rv_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:horizontalSpacing="5dp"
+                    android:listSelector="@android:color/transparent"
+                    android:numColumns="3"
+                    android:verticalSpacing="10dp" />
+
+            </LinearLayout>
+
         </ScrollView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#dfdfdf" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#dddddd"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:visibility="gone">
+            android:layout_height="0dp"
+            android:layout_weight="1.6"
+            android:orientation="vertical"
+            android:paddingBottom="20dp"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
 
-            <EditText
-                android:id="@+id/input"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Your message"
-                android:imeOptions="actionSend"
-                android:inputType="textCapSentences|textShortMessage"
-                android:lines="1"
-                android:singleLine="true" />
 
-            <ImageButton
-                android:id="@+id/send"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_send" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="20dp">
+
+                <EditText
+                    android:id="@+id/ed_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_above="@+id/tx_save"
+                    android:background="@drawable/shape_features_edit_bg"
+                    android:gravity="left|top"
+                    android:hint="请输入文本内容"
+                    android:padding="10dp"
+                    android:paddingBottom="20dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:textSize="14sp" />
+
+
+                <TextView
+                    android:id="@+id/tx_save"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="5dp"
+
+                    android:background="@drawable/shape_chat_edit_tx_bg"
+                    android:padding="5dp"
+                    android:text="保存"
+                    android:textColor="@drawable/shape_chat_edit_tx_color"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/tx_send"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/tx_save"
+                    android:layout_marginRight="10dp"
+                    android:layout_toLeftOf="@+id/tx_save"
+                    android:background="@drawable/shape_chat_edit_tx_bg"
+                    android:padding="5dp"
+                    android:text="发送"
+                    android:textColor="@drawable/shape_chat_edit_tx_color"
+                    android:textSize="16sp" />
+            </RelativeLayout>
+
+
         </LinearLayout>
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btn_clear"
+    <ImageView
+        android:id="@+id/btn_add"
         android:layout_width="80sp"
         android:layout_height="50sp"
         android:layout_alignParentRight="true"
-        android:text="clear" />
-
-
-</LinearLayout>
+        android:layout_centerInParent="true"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/icon_chat_add" />
+</RelativeLayout>

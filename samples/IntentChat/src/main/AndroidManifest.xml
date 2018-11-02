@@ -19,7 +19,7 @@
         <activity
             android:name="com.ijourney.ani.sample.intentchat.ChatActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="stateAlwaysHidden|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -3,13 +3,21 @@ package com.ijourney.ani.sample.intentchat;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.ijourney.ani.sample.adapter.MessageAdapter;
+import com.ijourney.ani.sample.bean.FeaturesBean;
 import com.ijourney.ani.sample.bean.MessageBean;
 
 import org.litepal.crud.DataSupport;
@@ -17,66 +25,59 @@ import org.litepal.crud.DataSupport;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageDialog extends Dialog implements View.OnClickListener {
-    ListView lv_message;
-    List<MessageBean> list = new ArrayList<>();
-    MessageAdapter adapter;
+public class MessageDialog extends Dialog {
+
+    EditText ed_btn_nick;
     Context context;
-    Button btn_delete_message, btn_send_message;
+    TextView tx_dialog_sure;
     private onMessageListener listener;
+    FeaturesBean featuresBean;
 
     public void setOnMessageListener(onMessageListener listener) {
         this.listener = listener;
     }
 
-    public MessageDialog(Context mContext) {
-        super(mContext, R.style.Dialog);
-        list = DataSupport.findAll(MessageBean.class);
+    public MessageDialog(Context mContext, FeaturesBean bean) {
+        super(mContext, R.style.DialogTheme);
         context = mContext;
+        this.featuresBean = bean;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog_message);
-        lv_message = (ListView) findViewById(R.id.lv_message);
-        adapter = new MessageAdapter(context, list);
-        btn_delete_message = (Button) findViewById(R.id.btn_delete_message);
-        btn_send_message = (Button) findViewById(R.id.btn_send_message);
-        lv_message.setAdapter(adapter);
-        lv_message.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ed_btn_nick = (EditText) findViewById(R.id.ed_btn_nick);
+        tx_dialog_sure = (TextView) findViewById(R.id.tx_dialog_sure);
+        tx_dialog_sure.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MessageBean bean = (MessageBean) adapter.getItem(position);
-                Toast.makeText(context, bean.getMessage(), Toast.LENGTH_LONG).show();
-                listener.sendMessage(bean);
-                dismiss();
+            public void onClick(View v) {
+                if (listener != null && !StringUtils.isEmpty(ed_btn_nick.getText().toString().trim())) {
+                    featuresBean.setName(ed_btn_nick.getText().toString().trim());
+                    if (featuresBean.save()) {
+                        listener.sendMessage(featuresBean);
+                        ed_btn_nick.setText("");
+                        dismiss();
+                    } else {
+                        Toast.makeText(context, "保存失败!", Toast.LENGTH_LONG).show();
+                    }
+
+
+                }
+
             }
         });
-        lv_message.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                MessageBean bean = (MessageBean) adapter.getItem(position);
-                bean.delete();
-                Toast.makeText(context,"长按删除",Toast.LENGTH_LONG).show();
-                adapter.setData();
-                return false;
-            }
-        });
+        Window dialogWindow = getWindow();
+        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+        DisplayMetrics d = context.getResources().getDisplayMetrics(); // 获取屏幕宽、高用
+        lp.width = (int) (d.widthPixels * 0.7); // 高度设置为屏幕的0.6
+        dialogWindow.setAttributes(lp);
     }
 
 
     public interface onMessageListener {
-        void sendMessage(MessageBean bean);
+        void sendMessage(FeaturesBean bean);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_delete_message:
-                break;
-            case R.id.btn_send_message:
-                break;
-        }
-    }
+
 }

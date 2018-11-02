@@ -16,6 +16,7 @@
 
 package com.ijourney.ani.sample.transmitter;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.ijourney.ani.sample.internal.AndroidNetworkIntents;
 
 import java.io.IOException;
@@ -58,6 +59,7 @@ public class Transmitter {
         try {
             socket = createSocket();
             transmit(socket, msg);
+            LogUtils.i("sendMsg:" + msg);
         } catch (UnknownHostException exception) {
             throw new TransmitterException("Unknown host", exception);
         } catch (SocketException exception) {
@@ -71,7 +73,7 @@ public class Transmitter {
         }
     }
 
-    protected DatagramSocket  createSocket() throws IOException {
+    protected DatagramSocket createSocket() throws IOException {
         return new DatagramSocket();
     }
 

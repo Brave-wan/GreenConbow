@@ -1,11 +1,10 @@
 package com.ijourney.ani.sample.intentchat;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,23 +13,34 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
+import com.ijourney.ani.sample.adapter.GridFixedListAdapter;
+import com.ijourney.ani.sample.adapter.GridListAdapter;
 import com.ijourney.ani.sample.adapter.IChatView;
+import com.ijourney.ani.sample.adapter.MyGridView;
+import com.ijourney.ani.sample.adapter.MyRecyclerView;
 import com.ijourney.ani.sample.bean.ChatMsgBean;
 import com.ijourney.ani.sample.bean.FeaturesBean;
+import com.ijourney.ani.sample.bean.FixedBean;
 import com.ijourney.ani.sample.bean.MessageBean;
+import com.ijourney.ani.sample.bean.SharedPreferencesUtils;
 import com.ijourney.ani.sample.discovery.Discovery;
 import com.ijourney.ani.sample.discovery.DiscoveryException;
 import com.ijourney.ani.sample.discovery.DiscoveryListener;
@@ -47,19 +57,17 @@ import java.util.Enumeration;
 import java.util.List;
 
 public class ChatActivity extends Activity implements DiscoveryListener, IChatView, OnEditorActionListener, OnClickListener, MessageDialog.onMessageListener {
-    private TextView chatView, tx_send, tx_edit, tx_save;
-    private EditText inputView, ed_content, ed_socket_position, ed_socket_page;
-    private ImageButton sendButton;
-    private RecyclerView rv_list;
+    private EditText ed_content;
+    private MyGridView rv_list, rv_fixed_list;
 
 
     private Discovery discovery;
     private Transmitter transmitter;
     ImageView img_tune_add;
+    ScrollView scrollView;
 
 
     private boolean discoveryStarted;
-    private ScrollView scrollView;
     private ChatPresent present;
     BaseQuickAdapter<FeaturesBean, BaseViewHolder> adapter;
     List<FeaturesBean> featuresBeans = new ArrayList<>();
@@ -69,66 +77,92 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_chat);
-        initView();
+
 
         present = new ChatPresent(this, this);
         present.setListener();
-
+        initView();
     }
 
     private void initView() {
+
         featuresBeans = DataSupport.findAll(FeaturesBean.class);
         discovery = new Discovery();
         discovery.setDisoveryListener(this);
         transmitter = new Transmitter();
         findViewById(R.id.img_tune_add).setOnClickListener(this);
-        rv_list = (RecyclerView) findViewById(R.id.rv_list);
+        scrollView = (ScrollView) findViewById(R.id.scrollView);
+        rv_fixed_list = (MyGridView) findViewById(R.id.rv_fixed_list);
+        rv_list = (MyGridView) findViewById(R.id.rv_list);
         findViewById(R.id.tx_send).setOnClickListener(this);
-        findViewById(R.id.tx_edit).setOnClickListener(this);
         findViewById(R.id.tx_save).setOnClickListener(this);
-        findViewById(R.id.btn_home).setOnClickListener(this);
-        findViewById(R.id.btn_video).setOnClickListener(this);
-        findViewById(R.id.btn_Introduction).setOnClickListener(this);
-        findViewById(R.id.btn_start).setOnClickListener(this);
-        findViewById(R.id.btn_socket_save).setOnClickListener(this);
-        ed_socket_position = (EditText) findViewById(R.id.ed_socket_position);
-        ed_socket_page = (EditText) findViewById(R.id.ed_socket_page);
-        chatView = (TextView) findViewById(R.id.chat);
-        scrollView = (ScrollView) findViewById(R.id.scroll);
-        inputView = (EditText) findViewById(R.id.input);
-        inputView.setOnEditorActionListener(this);
-        sendButton = (ImageButton) findViewById(R.id.send);
-        sendButton.setOnClickListener(this);
+        findViewById(R.id.btn_add).setOnClickListener(this);
         ed_content = (EditText) findViewById(R.id.ed_content);
 
-        findViewById(R.id.btn_clear).setOnClickListener(this);
+
         initAdapter();
+        initFixedAdapter();
+        clearListState();
+
+
+    }
+
+    List<FixedBean> fixedBeans = new ArrayList<>();
+    FixedBean fixedBean;
+
+    private void initFixedAdapter() {
+
+        fixedBeans = present.getFixedTop();
+        fixedListAdapter = new GridFixedListAdapter(this, fixedBeans);
+        rv_fixed_list.setAdapter(fixedListAdapter);
+        rv_fixed_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                fixedBean = (FixedBean) fixedListAdapter.getItem(position);
+                bean = null;
+                clearListState();
+                for (FixedBean features : fixedBeans) {
+                    features.setCheck(false);
+                }
+                fixedBeans.get(position).setCheck(true);
+                fixedListAdapter.setData(fixedBeans);
+                if (!StringUtils.isEmpty(fixedBean.getContent())) {
+                    sendChatMessage(fixedBean.getContent());
+                }
+                ed_content.setText(fixedBean.getContent());
+            }
+        });
     }
 
     FeaturesBean bean;
+    GridListAdapter gridListAdapter;
+    GridFixedListAdapter fixedListAdapter;
 
     private void initAdapter() {
         rv_list.setVisibility(featuresBeans.size() <= 0 ? View.GONE : View.VISIBLE);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayout.HORIZONTAL);
-        rv_list.setLayoutManager(linearLayoutManager);
-        adapter = new BaseQuickAdapter<FeaturesBean, BaseViewHolder>(R.layout.item_features, featuresBeans) {
+        gridListAdapter = new GridListAdapter(this, featuresBeans);
+        rv_list.setAdapter(gridListAdapter);
+
+        rv_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            protected void convert(BaseViewHolder helper, final FeaturesBean item) {
-                Button btn = (Button) helper.itemView.findViewById(R.id.btn_name);
-                btn.setText(item.getName());
-                btn.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bean = item;
-                        ed_content.setText(bean.getContent());
-                        ed_socket_page.setText(bean.getSocket_page());
-                        ed_socket_position.setText(bean.getSocket_position());
-                    }
-                });
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                bean = (FeaturesBean) gridListAdapter.getItem(position);
+                fixedBean = null;
+                clearFixedState();
+                for (FeaturesBean features : featuresBeans) {
+                    features.setCheck(false);
+                    features.save();
+                }
+                bean.setCheck(true);
+                bean.save();
+                initAdapter();
+                ed_content.setText(bean.getContent());
+                if (!StringUtils.isEmpty(bean.getContent())) {
+                    sendChatMessage(bean.getContent());
+                }
+
             }
-        };
-        rv_list.setAdapter(adapter);
+        });
     }
 
     @Override
@@ -138,9 +172,10 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
             discovery.enable();
             discoveryStarted = true;
         } catch (DiscoveryException exception) {
-            appendChatMessage("* (!) Could not start discovery: " + exception.getMessage());
+            LogUtils.i("* (!) Could not start discovery: " + exception.getMessage());
             discoveryStarted = false;
         }
+        ed_content.setText("");
         featuresBeans = DataSupport.findAll(FeaturesBean.class);
         initAdapter();
     }
@@ -153,33 +188,26 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
         }
     }
 
-    private void appendChatMessage(final String message) {
-        runOnUiThread(new Runnable() {
-            public void run() {
-                chatView.append(message + "\n");
-            }
-        });
-    }
 
     private void appendChatMessageFromSender(String sender, final String message) {
-        String localIp = getLocalIpAddress();
+        String localIp = present.getLocalIpAddress();
         final String total = "<" + sender + "> " + message;
-        appendChatMessage(total);
+        LogUtils.i(total);
     }
 
     @Override
     public void onDiscoveryError(Exception exception) {
-        appendChatMessage("* (!) Discovery error: " + exception.getMessage());
+        LogUtils.i("* (!) Discovery error: " + exception.getMessage());
     }
 
     @Override
     public void onDiscoveryStarted() {
-        appendChatMessage("* (>) Discovery started");
+        LogUtils.i("* (>) Discovery started");
     }
 
     @Override
     public void onDiscoveryStopped() {
-        appendChatMessage("* (<) Discovery stopped");
+        LogUtils.i("* (<) Discovery stopped");
     }
 
     @Override
@@ -188,118 +216,62 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
         appendChatMessageFromSender(sender, message);
     }
 
-    Handler mHandler = new Handler();
-    List<ChatMsgBean> listMsg = new ArrayList<>();
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
-            case R.id.send:
-                String message = inputView.getText().toString();
-                saveMessage(message);
-                sendChatMessage(message);
-                break;
-            case R.id.btn_clear:
-                chatView.setText("");
-                break;
             case R.id.img_tune_add:
                 startActivity(new Intent(this, FeaturesActivity.class));
-                break;
-            case R.id.tx_edit:
-                ed_content.setFocusable(ed_content.isFocusable() ? false : true);
                 break;
 
             case R.id.tx_send:
                 if (!StringUtils.isEmpty(ed_content.getText().toString())) {
                     sendChatMessage(ed_content.getText().toString());
-                    if (bean != null && !StringUtils.isEmpty(bean.getSocket_page()) && !StringUtils.isEmpty(bean.getSocket_position())) {
-                        present.sendMsgData(bean.getSocket_position(), bean.getSocket_page());
-                    }
                 } else {
                     Toast.makeText(this, "请输入命令类容!", Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.tx_save:
-                if (ed_content.getText().toString().trim().length() > 0 && bean != null) {
-                    bean.setContent(ed_content.getText().toString().trim());
-                    Toast.makeText(this, bean.save() ? "保存成功!" : "保存失败!", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(this, "保存类容为空!", Toast.LENGTH_LONG).show();
+                String edContentMsg = ed_content.getText().toString().trim();
+                if (!StringUtils.isEmpty(edContentMsg)) {
+                    msgSave(edContentMsg);
                 }
                 break;
-            case R.id.btn_socket_save:
-                if (bean != null) {
-                    if (!StringUtils.isEmpty(ed_socket_page.getText().toString()) && !StringUtils.isEmpty(ed_socket_position.getText().toString())) {
-                        bean.setSocket_page(ed_socket_page.getText().toString().trim());
-                        bean.setSocket_position(ed_socket_position.getText().toString().trim());
-                        Toast.makeText(this, bean.save() ? "保存成功!" : "保存失败!", Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(this, "保存类容为空!", Toast.LENGTH_LONG).show();
-                    }
-                }
+
+            case R.id.btn_add:
+                MessageDialog messageDialog = new MessageDialog(this, new FeaturesBean());
+                messageDialog.setOnMessageListener(this);
+                messageDialog.show();
                 break;
-            case R.id.btn_home:
-                present.sendMsgData("20", "20.png");
-                break;
-            case R.id.btn_video:
-                present.sendMsgData("21", "21.png");
-                break;
-            case R.id.btn_Introduction:
-                String msg = getString(R.string.first_paragraph) + getString(R.string.two_paragraph) + getString(R.string.three_paragraph) + getString(R.string.four_paragraph);
-                sendChatMessage(msg);
-                present.sendMsgData("1", "1.png");
-                break;
-            case R.id.btn_start:
-                present.sendMsgData("2", "2.png");
-                break;
+
         }
     }
 
-    int i = 0;
-    @SuppressLint("HandlerLeak")
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (i < 4) {
-                        transmitIntent(listMsg.get(i).getMsg());
-                        handler.postDelayed(this, listMsg.get(i).getTime());
-                        i++;
-                    }
-                }
-            });
-        }
-    };
 
-
-    List<String> list = new ArrayList<>();
-    // 每隔2秒发送一次心跳包，检测连接没有断开
-    private static final long HEART_BEAT_RATE = 5 * 1000;
-    private long sendTime = 0L;
-    private int postion = 0;
-    Runnable heartBeatRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (System.currentTimeMillis() - sendTime >= HEART_BEAT_RATE) {
-                Log.e("TAG", "postion:" + postion);
-                if (postion <= 2) {
-                    sendChatMessage(list.get(postion));
-                } else {
-                    mHandler.removeCallbacks(heartBeatRunnable);
-                }
+    public void msgSave(String msg) {
+        if (bean == null) {//选择保存的是按钮
+            SharedPreferencesUtils.init(this).put(fixedBean.getTag(), msg);
+            fixedBeans = present.getFixedTop();
+            fixedListAdapter.setData(fixedBeans);
+            Toast.makeText(this, "保存成功!", Toast.LENGTH_LONG).show();
+        } else {//item 内容保存
+            if (!StringUtils.isEmpty(msg) && bean != null) {
+                bean.setContent(msg);
+                Toast.makeText(this, bean.save() ? "保存成功!" : "保存失败!", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, "保存类容为空!", Toast.LENGTH_LONG).show();
             }
-            mHandler.postDelayed(this, HEART_BEAT_RATE); //每隔一定的时间，对长连接进行一次心跳检测
         }
-    };
+
+    }
+
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_SEND) {
-            String message = inputView.getText().toString();
-            sendChatMessage(message);
+//            String message = inputView.getText().toString();
+//            sendChatMessage(message);
             return true;
         }
 
@@ -307,25 +279,12 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
     }
 
     public void sendChatMessage(String message) {
-
         if (message.length() == 0) {
             return; // No message to send
         }
-        inputView.setText("");
-
         transmitIntentOnBackgroundThread(message);
     }
 
-    public void saveMessage(String message) {
-        MessageBean news = new MessageBean();
-        news.setMessage(message);
-        news.setTime();
-        if (news.save()) {
-            Toast.makeText(this, "Success", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Fail", Toast.LENGTH_LONG).show();
-        }
-    }
 
     private void transmitIntentOnBackgroundThread(final String msg) {
         new Thread() {
@@ -339,40 +298,48 @@ public class ChatActivity extends Activity implements DiscoveryListener, IChatVi
         try {
             transmitter.transmit(msg);
         } catch (TransmitterException exception) {
-            appendChatMessage("Could not transmit intent: " + exception.getMessage());
+            LogUtils.i("Could not transmit intent: " + exception.getMessage());
         }
     }
 
-    public static String getLocalIpAddress() {
-        String ipaddress = "";
-        try {
-            for (Enumeration<NetworkInterface> en = NetworkInterface
-                    .getNetworkInterfaces(); en.hasMoreElements(); ) {
-                NetworkInterface intf = en.nextElement();
-                for (Enumeration<InetAddress> enumIpAddr = intf
-                        .getInetAddresses(); enumIpAddr.hasMoreElements(); ) {
-                    InetAddress inetAddress = enumIpAddr.nextElement();
-                    if (!inetAddress.isLoopbackAddress()
-                            && inetAddress.isSiteLocalAddress()) {
-                        ipaddress = inetAddress.getHostAddress().toString();
-                        break;
-                    }
-                }
-            }
-        } catch (SocketException ex) {
-            Log.e("", ex.toString());
-        }
-
-        return ipaddress;
-    }
 
     @Override
-    public void sendMessage(MessageBean bean) {
-        sendChatMessage(bean.getMessage());
+    public void sendMessage(FeaturesBean bean) {
+        featuresBeans = DataSupport.findAll(FeaturesBean.class);
+        initAdapter();
     }
 
     @Override
     public void showMsg() {
 
+    }
+
+    private String btnType = null;
+
+
+    @Override
+    public void sendChatMsg(String s, String s1, String type, String s2) {
+
+    }
+
+
+    public void clearListState() {
+        if (featuresBeans != null) {
+            for (FeaturesBean featuresBean : featuresBeans) {
+                featuresBean.setCheck(false);
+                featuresBean.save();
+            }
+        }
+        gridListAdapter.setData(featuresBeans);
+
+    }
+
+    public void clearFixedState() {
+        if (fixedBeans != null) {
+            for (FixedBean featuresBean : fixedBeans) {
+                featuresBean.setCheck(false);
+            }
+        }
+        fixedListAdapter.setData(fixedBeans);
     }
 }

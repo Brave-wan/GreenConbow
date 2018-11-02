@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
+    android:layout_height="wrap_content"
     android:background="@android:color/white"
+    android:gravity="center"
     android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/lv_message"
+    <EditText
+        android:id="@+id/ed_btn_nick"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/ll_root" />
+        android:layout_height="40dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/shape_features_edit_bg"
+        android:hint="请输入按钮名称"
+        android:paddingLeft="15dp"
+        android:textSize="14sp" />
 
-    <LinearLayout
-        android:id="@+id/ll_root"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_alignParentBottom="true">
+        android:layout_height="1dp"
+        android:layout_marginTop="15dp"
+        android:background="#dfdfdf" />
 
-        <Button
-            android:id="@+id/btn_delete_message"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="delete" />
+    <TextView
+        android:id="@+id/tx_dialog_sure"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center"
+        android:text="确定"
+        android:textColor="@color/black"
+        android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/btn_send_message"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="send" />
-    </LinearLayout>
-
-</RelativeLayout>
+</LinearLayout>

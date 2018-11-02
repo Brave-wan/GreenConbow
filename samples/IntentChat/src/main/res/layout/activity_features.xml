@@ -32,44 +32,6 @@
         android:layout_height="1dp"
         android:background="#dfdfdf" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp">
-
-        <TextView
-            android:id="@+id/tx_features_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="名称" />
-
-        <EditText
-            android:id="@+id/ed_features_input"
-            android:layout_width="match_parent"
-            android:layout_height="35dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
-            android:layout_toLeftOf="@+id/btn_features_save"
-            android:layout_toRightOf="@+id/tx_features_title"
-            android:background="@drawable/shape_features_edit_bg"
-            android:paddingLeft="8dp" />
-
-        <Button
-            android:id="@+id/btn_features_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:text="保存" />
-
-    </RelativeLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:background="#dfdfdf" />
 
     <ListView
         android:id="@+id/lv_features_list"

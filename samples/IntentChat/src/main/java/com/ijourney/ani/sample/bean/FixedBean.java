@@ -2,26 +2,36 @@ package com.ijourney.ani.sample.bean;
 
 import org.litepal.crud.DataSupport;
 
-public class FeaturesBean extends DataSupport {
+public class FixedBean {
     private String name;
     private String content;
     private String socket_position;
     private String socket_page;
     private boolean isCheck;
+    private String tag;
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
+    }
 
     public void setCheck(boolean check) {
         isCheck = check;
     }
 
-    public FeaturesBean() {
+    public FixedBean() {
 
     }
 
-    public FeaturesBean(String name, String content, String socket_position, String socket_page) {
+    public FixedBean(String name, String content, String socket_position, String socket_page, String tag) {
         this.name = name;
         this.content = content;
         this.socket_page = socket_page;
         this.socket_position = socket_position;
+        this.tag = tag;
 
     }
 
